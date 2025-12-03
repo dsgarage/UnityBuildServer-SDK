@@ -1,0 +1,33 @@
+{
+    "name": "com.dsgarage.unitybuildserver-sdk",
+    "version": "0.0.5",
+    "displayName": "DSGarage Unity Build Server SDK",
+    "description": "Unity SDK for DSGarage Unity Build Server API. Provides easy access to FBX4VRM Bug Report API and other services.",
+    "unity": "2020.3",
+    "unityRelease": "0f1",
+    "documentationUrl": "https://github.com/dsgarage/UnityBuildServer-SDK/blob/main/README.md",
+    "changelogUrl": "https://github.com/dsgarage/UnityBuildServer-SDK/blob/main/CHANGELOG.md",
+    "author": {
+        "name": "DSGarage",
+        "email": "dsgarage@gmail.com"
+    },
+    "keywords": [
+        "api",
+        "bug-report",
+        "fbx4vrm",
+        "vrm",
+        "sdk"
+    ],
+    "category": "Tools",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dsgarage/UnityBuildServer-SDK.git"
+    },
+    "samples": [
+        {
+            "displayName": "Basic Usage",
+            "description": "Basic examples of using the SDK",
+            "path": "Samples~/BasicUsage"
+        }
+    ]
+}

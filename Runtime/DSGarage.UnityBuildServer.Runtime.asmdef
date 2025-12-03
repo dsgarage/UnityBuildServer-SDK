@@ -1,0 +1,14 @@
+{
+    "name": "DSGarage.UnityBuildServer.Runtime",
+    "rootNamespace": "DSGarage.UnityBuildServer",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

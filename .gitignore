@@ -1,0 +1,21 @@
+# DLL Build artifacts
+DLLBuild/
+bin/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.suo
+*.user
+*.sln.docstates
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
