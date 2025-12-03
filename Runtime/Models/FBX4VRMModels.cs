@@ -389,7 +389,7 @@ namespace DSGarage.UnityBuildServer.Models
     #region Screenshot
 
     /// <summary>
-    /// Screenshot information
+    /// Screenshot information with multi-angle support
     /// </summary>
     [Serializable]
     public class FBX4VRMScreenshot
@@ -397,8 +397,34 @@ namespace DSGarage.UnityBuildServer.Models
         public string format = "PNG";
         public int width;
         public int height;
+
+        /// <summary>Angle names for multi-angle screenshots (e.g., "front", "back", "left", "right")</summary>
         public List<string> angles = new List<string>();
+
+        /// <summary>Single image base64 (for backward compatibility)</summary>
         public string base64;
+
+        /// <summary>Multiple images base64 - one per angle (for multi-angle screenshots)</summary>
+        public List<string> base64_images = new List<string>();
+    }
+
+    /// <summary>
+    /// Additional image attached by user (e.g., reference images, error screenshots)
+    /// </summary>
+    [Serializable]
+    public class FBX4VRMAdditionalImage
+    {
+        /// <summary>Original filename</summary>
+        public string filename;
+
+        /// <summary>Image format (PNG, JPG, etc.)</summary>
+        public string format;
+
+        /// <summary>Base64 encoded image data</summary>
+        public string base64;
+
+        /// <summary>Optional description</summary>
+        public string description;
     }
 
     #endregion
@@ -427,7 +453,16 @@ namespace DSGarage.UnityBuildServer.Models
         public FBX4VRMDynamics dynamics;
         public FBX4VRMNotifications notifications;
 
+        /// <summary>Primary screenshot (single or grid image)</summary>
         public FBX4VRMScreenshot screenshot;
+
+        /// <summary>Additional screenshots from different angles</summary>
+        public List<FBX4VRMScreenshot> additional_screenshots = new List<FBX4VRMScreenshot>();
+
+        /// <summary>Additional images attached by user (reference images, error screenshots, etc.)</summary>
+        public List<FBX4VRMAdditionalImage> additional_images = new List<FBX4VRMAdditionalImage>();
+
+        /// <summary>User comment or notes</summary>
         public string user_comment;
 
         /// <summary>

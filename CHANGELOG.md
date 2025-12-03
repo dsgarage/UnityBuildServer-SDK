@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.7] - 2025-12-04
+
+### Added
+- **Multi-angle Screenshot Support**
+  - `FBX4VRMScreenshot.base64_images` - List of base64 images for each angle
+  - `AddMultiAngleScreenshots()` - Helper to add multiple angle screenshots
+- **Additional Images Support**
+  - `FBX4VRMAdditionalImage` - Model for user-attached images
+  - `FBX4VRMBugReportRequest.additional_images` - List of additional images
+  - `FBX4VRMBugReportRequest.additional_screenshots` - List of additional screenshots
+  - `AddAdditionalImage()` - Helper to add user images
+- **Static ServerUrl Accessor**
+  - `FBX4VRMApiClient.GetServerUrl()` - Get current server URL for debugging
+
+---
+
 ## [0.0.6] - 2025-12-03
 
 ### Added

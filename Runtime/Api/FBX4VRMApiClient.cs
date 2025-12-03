@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using DSGarage.UnityBuildServer.Models;
 
@@ -96,6 +97,11 @@ namespace DSGarage.UnityBuildServer.Api
         {
             _instance = new FBX4VRMApiClient(serverUrl);
         }
+
+        /// <summary>
+        /// Get the current server URL (for debugging)
+        /// </summary>
+        public static string GetServerUrl() => Instance.ServerUrl;
 
         #region API Info
 
@@ -369,6 +375,120 @@ namespace DSGarage.UnityBuildServer.Api
                 height = height,
                 base64 = Utils.JsonHelper.BytesToBase64(screenshotBytes)
             };
+        }
+
+        /// <summary>
+        /// Add multi-angle screenshots to bug report
+        /// </summary>
+        /// <param name="request">Bug report request</param>
+        /// <param name="screenshots">Dictionary of angle name to Texture2D</param>
+        public static void AddMultiAngleScreenshots(
+            FBX4VRMBugReportRequest request,
+            Dictionary<string, Texture2D> screenshots)
+        {
+            if (screenshots == null || screenshots.Count == 0) return;
+
+            if (request.screenshot == null)
+            {
+                request.screenshot = new FBX4VRMScreenshot { format = "PNG" };
+            }
+
+            foreach (var kvp in screenshots)
+            {
+                if (kvp.Value == null) continue;
+                request.screenshot.angles.Add(kvp.Key);
+                request.screenshot.base64_images.Add(Utils.JsonHelper.TextureToBase64(kvp.Value, true));
+
+                // Set width/height from first image
+                if (request.screenshot.width == 0)
+                {
+                    request.screenshot.width = kvp.Value.width;
+                    request.screenshot.height = kvp.Value.height;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add multi-angle screenshots from byte arrays
+        /// </summary>
+        /// <param name="request">Bug report request</param>
+        /// <param name="screenshots">Dictionary of angle name to PNG byte array</param>
+        /// <param name="width">Image width</param>
+        /// <param name="height">Image height</param>
+        public static void AddMultiAngleScreenshots(
+            FBX4VRMBugReportRequest request,
+            Dictionary<string, byte[]> screenshots,
+            int width,
+            int height)
+        {
+            if (screenshots == null || screenshots.Count == 0) return;
+
+            if (request.screenshot == null)
+            {
+                request.screenshot = new FBX4VRMScreenshot
+                {
+                    format = "PNG",
+                    width = width,
+                    height = height
+                };
+            }
+
+            foreach (var kvp in screenshots)
+            {
+                if (kvp.Value == null || kvp.Value.Length == 0) continue;
+                request.screenshot.angles.Add(kvp.Key);
+                request.screenshot.base64_images.Add(Utils.JsonHelper.BytesToBase64(kvp.Value));
+            }
+        }
+
+        /// <summary>
+        /// Add an additional image to bug report
+        /// </summary>
+        /// <param name="request">Bug report request</param>
+        /// <param name="texture">Image texture</param>
+        /// <param name="filename">Original filename</param>
+        /// <param name="description">Optional description</param>
+        public static void AddAdditionalImage(
+            FBX4VRMBugReportRequest request,
+            Texture2D texture,
+            string filename,
+            string description = null)
+        {
+            if (texture == null) return;
+
+            request.additional_images.Add(new FBX4VRMAdditionalImage
+            {
+                filename = filename,
+                format = "PNG",
+                base64 = Utils.JsonHelper.TextureToBase64(texture, true),
+                description = description
+            });
+        }
+
+        /// <summary>
+        /// Add an additional image from byte array
+        /// </summary>
+        /// <param name="request">Bug report request</param>
+        /// <param name="imageBytes">Image data as byte array</param>
+        /// <param name="filename">Original filename</param>
+        /// <param name="format">Image format (PNG, JPG, etc.)</param>
+        /// <param name="description">Optional description</param>
+        public static void AddAdditionalImage(
+            FBX4VRMBugReportRequest request,
+            byte[] imageBytes,
+            string filename,
+            string format = "PNG",
+            string description = null)
+        {
+            if (imageBytes == null || imageBytes.Length == 0) return;
+
+            request.additional_images.Add(new FBX4VRMAdditionalImage
+            {
+                filename = filename,
+                format = format,
+                base64 = Utils.JsonHelper.BytesToBase64(imageBytes),
+                description = description
+            });
         }
 
         #endregion
