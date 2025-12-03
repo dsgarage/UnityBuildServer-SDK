@@ -5,6 +5,7 @@ Unity SDK for DSGarage Unity Build Server API.
 ## Features
 
 - FBX4VRM Bug Report API client
+- **Queue-based submission** (recommended) - reliable background processing
 - Runtime & Editor support
 - Self-signed certificate support
 - Easy-to-use API
@@ -23,7 +24,7 @@ Copy the `UnitySDK` folder to your project's `Packages` directory.
 
 ## Quick Start
 
-### Runtime Usage
+### Runtime Usage (Queue System - Recommended)
 
 ```csharp
 using DSGarage.UnityBuildServer.Api;
@@ -39,23 +40,25 @@ FBX4VRMApiManager.Instance.GetAvatarList(
     error => Debug.LogError(error)
 );
 
-// Submit simple bug report
-FBX4VRMApiManager.Instance.SubmitSimpleBugReport(
+// Submit bug report to queue (recommended)
+var request = FBX4VRMApiClient.CreateBugReport(
     "MyModel",
     success: true,
-    errorMessage: null,
-    onSuccess: response => Debug.Log($"Submitted: {response.github_issue_url}"),
-    onError: error => Debug.LogError(error)
+    packageVersion: "1.0.0",
+    unityVersion: Application.unityVersion
 );
 
-// Submit bug report with screenshot
-FBX4VRMApiManager.Instance.SubmitBugReportWithScreenshot(
-    "MyModel",
-    success: false,
-    errorMessage: "Conversion failed at MaterialProcessor",
-    onSuccess: response => Debug.Log("Submitted with screenshot!"),
+StartCoroutine(FBX4VRMApiClient.Instance.SubmitToQueue(
+    request,
+    onSuccess: response => Debug.Log($"Queued: {response.queue_id}"),
     onError: error => Debug.LogError(error)
-);
+));
+
+// Check queue status
+StartCoroutine(FBX4VRMApiClient.Instance.GetQueueStats(
+    onSuccess: stats => Debug.Log($"Pending: {stats.pending}, Completed: {stats.completed}"),
+    onError: error => Debug.LogError(error)
+));
 ```
 
 ### Editor Usage
@@ -173,6 +176,54 @@ FBX4VRMApiManager.Instance.Client.VerboseLogging = true;
 FBX4VRMEditorApiClient.VerboseLogging = true;
 ```
 
+## Queue System
+
+The SDK supports two methods for submitting bug reports:
+
+### Queue-based Submission (Recommended)
+
+Reports are sent to a queue and processed asynchronously in the background. This provides better reliability and prevents blocking the main application.
+
+```csharp
+// Submit to queue
+StartCoroutine(FBX4VRMApiClient.Instance.SubmitToQueue(
+    request,
+    onSuccess: response => Debug.Log($"Queued: {response.queue_id}"),
+    onError: error => Debug.LogError(error)
+));
+```
+
+**Endpoint:** `POST /bug-reports/queue/submit`
+
+### Direct Submission (Legacy)
+
+Reports are processed immediately. Use only if you need synchronous processing or immediate GitHub issue creation.
+
+```csharp
+// Submit directly (legacy)
+StartCoroutine(FBX4VRMApiClient.Instance.SubmitBugReport(
+    request,
+    onSuccess: response => Debug.Log($"Issue: {response.github_issue_url}"),
+    onError: error => Debug.LogError(error)
+));
+```
+
+**Endpoint:** `POST /api/v1/fbx4vrm/bug-reports`
+
+### Queue Status
+
+```csharp
+StartCoroutine(FBX4VRMApiClient.Instance.GetQueueStats(
+    onSuccess: stats => {
+        Debug.Log($"Pending: {stats.pending}");
+        Debug.Log($"Processing: {stats.processing}");
+        Debug.Log($"Completed: {stats.completed}");
+        Debug.Log($"Failed: {stats.failed}");
+    },
+    onError: error => Debug.LogError(error)
+));
+```
+
 ## API Reference
 
 ### FBX4VRMApiManager (MonoBehaviour)
@@ -191,7 +242,9 @@ FBX4VRMEditorApiClient.VerboseLogging = true;
 |--------|-------------|
 | `GetApiInfo()` | Get API information |
 | `GetAvatarList()` | Get avatar list |
-| `SubmitBugReport()` | Submit bug report |
+| `SubmitToQueue()` | Submit bug report to queue (recommended) |
+| `GetQueueStats()` | Get queue statistics |
+| `SubmitBugReport()` | Submit bug report directly (legacy) |
 | `CreateBugReport()` | Create bug report request |
 | `AddScreenshot()` | Add screenshot to request |
 

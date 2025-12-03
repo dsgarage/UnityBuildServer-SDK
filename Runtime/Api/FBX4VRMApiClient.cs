@@ -141,10 +141,93 @@ namespace DSGarage.UnityBuildServer.Api
 
         #endregion
 
-        #region Bug Report Submission
+        #region Bug Report Submission (Queue - Recommended)
+
+        private const string QUEUE_PREFIX = "/bug-reports/queue";
 
         /// <summary>
-        /// Submit a bug report
+        /// Submit a bug report to the queue system (recommended).
+        /// Reports are processed asynchronously in the background.
+        /// </summary>
+        public IEnumerator SubmitToQueue(
+            FBX4VRMBugReportRequest request,
+            Action<ApiResponse<FBX4VRMQueueSubmitResponse>> callback)
+        {
+            // Ensure required fields are set
+            if (string.IsNullOrEmpty(request.report_id))
+            {
+                request.report_id = FBX4VRMBugReportRequest.GenerateReportId();
+            }
+            if (string.IsNullOrEmpty(request.timestamp))
+            {
+                request.timestamp = FBX4VRMBugReportRequest.GetTimestamp();
+            }
+
+            yield return PostJsonAsync<FBX4VRMBugReportRequest, FBX4VRMQueueSubmitResponse>(
+                $"{QUEUE_PREFIX}/submit",
+                request,
+                callback
+            );
+        }
+
+        /// <summary>
+        /// Submit a bug report to the queue system (simplified callback).
+        /// This is the recommended method for submitting bug reports.
+        /// </summary>
+        public IEnumerator SubmitToQueue(
+            FBX4VRMBugReportRequest request,
+            Action<FBX4VRMQueueSubmitResponse> onSuccess,
+            Action<string> onError = null)
+        {
+            yield return SubmitToQueue(request, response =>
+            {
+                if (response.Success && response.Data != null && response.Data.IsSuccess)
+                {
+                    onSuccess?.Invoke(response.Data);
+                }
+                else
+                {
+                    string error = response.Error ?? response.Data?.message ?? "Unknown error";
+                    onError?.Invoke(error);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Get queue statistics
+        /// </summary>
+        public IEnumerator GetQueueStats(Action<ApiResponse<FBX4VRMQueueStatsResponse>> callback)
+        {
+            yield return GetAsync($"{QUEUE_PREFIX}/stats", callback);
+        }
+
+        /// <summary>
+        /// Get queue statistics (simplified callback)
+        /// </summary>
+        public IEnumerator GetQueueStats(
+            Action<FBX4VRMQueueStatsResponse> onSuccess,
+            Action<string> onError = null)
+        {
+            yield return GetQueueStats(response =>
+            {
+                if (response.Success && response.Data != null)
+                {
+                    onSuccess?.Invoke(response.Data);
+                }
+                else
+                {
+                    onError?.Invoke(response.Error ?? "Unknown error");
+                }
+            });
+        }
+
+        #endregion
+
+        #region Bug Report Submission (Direct - Legacy)
+
+        /// <summary>
+        /// Submit a bug report directly (legacy method).
+        /// Consider using SubmitToQueue() instead for better reliability.
         /// </summary>
         public IEnumerator SubmitBugReport(
             FBX4VRMBugReportRequest request,
@@ -168,7 +251,8 @@ namespace DSGarage.UnityBuildServer.Api
         }
 
         /// <summary>
-        /// Submit a bug report (simplified callback)
+        /// Submit a bug report directly (legacy method, simplified callback).
+        /// Consider using SubmitToQueue() instead for better reliability.
         /// </summary>
         public IEnumerator SubmitBugReport(
             FBX4VRMBugReportRequest request,

@@ -567,4 +567,33 @@ namespace DSGarage.UnityBuildServer.Models
     }
 
     #endregion
+
+    #region Queue System
+
+    /// <summary>
+    /// Queue submission response
+    /// </summary>
+    [Serializable]
+    public class FBX4VRMQueueSubmitResponse
+    {
+        public string status;
+        public string queue_id;
+        public string message;
+
+        public bool IsSuccess => status == "queued";
+    }
+
+    /// <summary>
+    /// Queue statistics response
+    /// </summary>
+    [Serializable]
+    public class FBX4VRMQueueStatsResponse
+    {
+        public int pending;
+        public int processing;
+        public int completed;
+        public int failed;
+    }
+
+    #endregion
 }

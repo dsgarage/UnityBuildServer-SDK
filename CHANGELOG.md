@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2025-12-03
+
+### Added
+- **Queue System Support** - New recommended method for submitting bug reports
+  - `SubmitToQueue()` - Submit reports to background processing queue
+  - `GetQueueStats()` - Check queue status (pending, processing, completed, failed)
+  - `FBX4VRMQueueSubmitResponse` - Response model for queue submissions
+  - `FBX4VRMQueueStatsResponse` - Response model for queue statistics
+
+### Changed
+- Direct submission (`SubmitBugReport()`) is now marked as legacy
+- Updated README with Queue System documentation
+
+---
+
 ## [0.0.5] - 2025-12-03
 
 ### Changed
